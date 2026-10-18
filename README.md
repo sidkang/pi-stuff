@@ -27,6 +27,7 @@ Extensions with npm dependencies, published to npm.
 
 | Package | Description |
 | --- | --- |
+| [@sidkang/pi-image-gen](packages/pi-image-gen) | `image_generate` tool; Apache-2.0 fork of [abhishek944/pi-image-gen](https://github.com/abhishek944/pi-image-gen) that can reuse Pi providers |
 | [@sidkang/pi-web-access](packages/pi-web-access) | `web_search`, `x_search`, and `fetch_content` tools |
 
 ```sh

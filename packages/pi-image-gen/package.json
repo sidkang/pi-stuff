@@ -1,0 +1,82 @@
+{
+  "name": "@sidkang/pi-image-gen",
+  "version": "0.1.0",
+  "description": "Image generation for Pi (fork of @abhishek944/pi-image-gen that can reuse providers configured in Pi models.json)",
+  "keywords": [
+    "pi-package",
+    "pi-extension",
+    "image-generation"
+  ],
+  "license": "Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    },
+    "./extension": {
+      "types": "./dist/extension.d.ts",
+      "import": "./dist/extension.js",
+      "default": "./dist/extension.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "skills",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "pi": {
+    "extensions": [
+      "./src/extension.ts"
+    ],
+    "skills": [
+      "./skills"
+    ]
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sidkang/pi-stuff.git",
+    "directory": "packages/pi-image-gen"
+  },
+  "scripts": {
+    "clean": "node -e \"require('node:fs').rmSync('dist', { recursive: true, force: true })\"",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit --pretty false",
+    "test": "npm run build && node --test test/*.test.mjs"
+  },
+  "dependencies": {
+    "@amaster.ai/pi-shared": "^0.1.10",
+    "upng-js": "^2.1.0"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "typebox": "*"
+  },
+  "peerDependenciesMeta": {
+    "@earendil-works/pi-ai": {
+      "optional": true
+    },
+    "@earendil-works/pi-coding-agent": {
+      "optional": true
+    },
+    "typebox": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@earendil-works/pi-ai": "0.80.10",
+    "@earendil-works/pi-coding-agent": "0.80.10",
+    "typebox": "*",
+    "typescript": "^5.9.3"
+  },
+  "homepage": "https://github.com/sidkang/pi-stuff/tree/main/packages/pi-image-gen#readme"
+}
