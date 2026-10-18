@@ -1,0 +1,51 @@
+{
+  "name": "apply-patch",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "In-process apply_patch tool for Pi",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "test": "npm run test:unit && npm run test:e2e",
+    "test:watch": "node --import tsx --test --watch apply-patch.test.mjs apply-patch-output.test.mjs apply-patch-compact-blocks.test.mjs better-tui-apply-patch.test.mjs better-tui-v1.test.mjs workspace-files.test.mjs workspace-access-v2-apply.test.mjs registration.test.mjs tool-error-semantics.test.mjs",
+    "typecheck": "tsc -p tsconfig.json --noEmit && npm run typecheck:host",
+    "test:unit": "node --import tsx --test apply-patch.test.mjs apply-patch-output.test.mjs apply-patch-compact-blocks.test.mjs better-tui-apply-patch.test.mjs better-tui-v1.test.mjs workspace-files.test.mjs workspace-access-v2-apply.test.mjs registration.test.mjs tool-error-semantics.test.mjs pi-host-test-helper.test.mjs",
+    "test:e2e": "node --import tsx --test apply-patch-codemode.e2e.test.mjs",
+    "typecheck:host": "node --max-old-space-size=4096 pi-host-typecheck.mjs"
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "^0.84.0",
+    "@earendil-works/pi-coding-agent": "^0.84.0",
+    "typebox": "*",
+    "@earendil-works/pi-tui": "*"
+  },
+  "peerDependenciesMeta": {
+    "@earendil-works/pi-ai": {
+      "optional": true
+    },
+    "@earendil-works/pi-coding-agent": {
+      "optional": true
+    },
+    "typebox": {
+      "optional": true
+    }
+  },
+  "overrides": {
+    "@earendil-works/pi-telemetry": "0.84.0"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-ai": "0.84.0",
+    "@earendil-works/pi-coding-agent": "0.84.0",
+    "@types/node": "24.12.4",
+    "tsx": "4.21.0",
+    "typebox": "1.3.7",
+    "typescript": "6.0.3"
+  }
+}

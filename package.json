@@ -3,10 +3,30 @@
   "private": true,
   "description": "Personal Pi skills and extensions",
   "license": "MIT",
-  "scripts": {
-    "test": "node --test 'skills/**/*.test.mjs' && npm test --workspaces --if-present"
-  },
+  "keywords": [
+    "pi-package"
+  ],
   "workspaces": [
-    "packages/*"
-  ]
+    "extensions/apply-patch",
+    "extensions/btw",
+    "extensions/codex-tools",
+    "extensions/context",
+    "extensions/goal",
+    "extensions/pi-image-gen",
+    "extensions/soul",
+    "extensions/web-access",
+    "extensions/zfork"
+  ],
+  "scripts": {
+    "test": "node --test 'skills/**/*.test.mjs' && npm test -w extensions/pi-image-gen -w extensions/web-access"
+  },
+  "pi": {
+    "extensions": [
+      "./extensions"
+    ],
+    "skills": [
+      "./skills",
+      "./extensions/pi-image-gen/skills"
+    ]
+  }
 }

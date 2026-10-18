@@ -10,7 +10,7 @@ metadata:
       - local: add binding contract tests and use the TypeScript extension entry for runtime-only mise installations; disable the prepare build, include source in package files, remove redundant root npmignore, move development ignore rules to the repository root, and normalize illustrative image links to file URIs.
 ---
 
-# @sidkang/pi-image-gen
+# pi-image-gen (fork)
 
 ## Fork changes: Pi provider integration
 
@@ -21,8 +21,8 @@ an existing Pi provider's endpoint, credential, and headers at request time.
 It does not read `auth.json` directly, copy credentials into image settings, or
 send a chat-model request to generate an image.
 
-Install the fork with `pi install npm:@sidkang/pi-image-gen`, not the upstream
-install commands below. Pi loads `src/extension.ts`; installation needs no
+Install the fork as part of `pi install git:github.com/sidkang/pi-stuff`, not with
+the upstream install commands below. Pi loads `src/extension.ts`; installation needs no
 compiler or `dist`. Development tests still build the library.
 The remaining sections describe upstream behavior unless noted here.
 
@@ -80,7 +80,7 @@ changes only require `/image-gen reload`. Project settings override global ones.
 
 The package registers its bundled skills. To load only the prompting skill and
 leave the optional sprite skill off, filter the package in Pi settings:
-`{ "source": "npm:@sidkang/pi-image-gen", "skills": ["skills/image-gen"] }`.
+`{ "source": "git:github.com/sidkang/pi-stuff", "skills": ["!extensions/pi-image-gen/skills/sprite-gen"] }`.
 Do not load the upstream package at the same time as this fork: they register
 the same tool and command names.
 

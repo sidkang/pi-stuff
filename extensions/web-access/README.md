@@ -1,8 +1,4 @@
-# @sidkang/pi-web-access
-
-```sh
-pi install npm:@sidkang/pi-web-access
-```
+# web-access
 
 Public `web_search`, `x_search`, and `fetch_content` tools for Pi. This bundle is
 the sole owner of those tools. Codex Tools no longer registers or configures

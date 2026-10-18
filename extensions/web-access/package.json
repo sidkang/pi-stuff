@@ -1,5 +1,5 @@
 {
-  "name": "@sidkang/pi-web-access",
+  "name": "web-access",
   "version": "0.1.1",
   "private": true,
   "type": "module",
@@ -13,10 +13,6 @@
     "test:e2e": "node --import tsx --test codemode.e2e.test.mjs",
     "typecheck": "node typecheck-host.mjs"
   },
-  "keywords": [
-    "pi-package",
-    "pi-extension"
-  ],
   "pi": {
     "extensions": [
       "./index.ts"
@@ -58,19 +54,5 @@
     "typescript": "6.0.3",
     "@earendil-works/pi-tui": "0.84.0"
   },
-  "license": "MIT",
-  "files": [
-    "*.ts",
-    "README.md",
-    "LICENSE"
-  ],
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/sidkang/pi-stuff.git",
-    "directory": "packages/pi-web-access"
-  },
-  "homepage": "https://github.com/sidkang/pi-stuff/tree/main/packages/pi-web-access#readme",
-  "publishConfig": {
-    "access": "public"
-  }
+  "license": "MIT"
 }

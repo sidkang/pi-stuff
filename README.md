@@ -1,43 +1,33 @@
 # pi-stuff
 
-Personal [Pi](https://pi.dev) skills and extensions.
+Personal [Pi](https://pi.dev) skills and extensions, installed together as one Pi package:
 
-## Skills
+```sh
+pi install git:github.com/sidkang/pi-stuff
+pi update --extensions   # after pushing changes
+```
 
-| Skill | Description | License |
+Pi installs the npm dependencies of every extension. To turn items off, use the object form of the package in Pi settings, for example `{ "source": "git:github.com/sidkang/pi-stuff", "extensions": ["!extensions/whimsical.ts"] }`, or run `pi config`.
+
+## Contents
+
+- `skills/`: jj, librarian, quark, try-serve, web-browser.
+- `extensions/`: single-file extensions (`*.ts`) and directory extensions. Directories with npm dependencies or tests are npm workspaces.
+
+Adapted items keep their upstream license in their directory:
+
+| Item | License | Upstream |
 | --- | --- | --- |
-| [jj](skills/jj) | Use Jujutsu (jj) and translate Git requests to jj-native operations | MIT |
-| [librarian](skills/librarian) | Cache remote Git repositories for local source and history inspection | Apache-2.0, adapted from [mitsuhiko/agent-stuff](https://github.com/mitsuhiko/agent-stuff) |
-| [quark](skills/quark) | Operate Quark Drive (夸克网盘) with reversible deletion and resumable uploads | Apache-2.0, adapted from [quark-clouddrive/quarkclouddrive_offical](https://github.com/quark-clouddrive/quarkclouddrive_offical) |
-| [try-serve](skills/try-serve) | Share local HTML or a static directory through a temporary Cloudflare tunnel | MIT |
-| [web-browser](skills/web-browser) | Drive Chrome or Chromium through the Chrome DevTools Protocol | Apache-2.0, adapted from [mitsuhiko/agent-stuff](https://github.com/mitsuhiko/agent-stuff) |
+| `skills/librarian`, `skills/web-browser` | Apache-2.0 | [mitsuhiko/agent-stuff](https://github.com/mitsuhiko/agent-stuff) |
+| `skills/quark` | Apache-2.0 | [quark-clouddrive/quarkclouddrive_offical](https://github.com/quark-clouddrive/quarkclouddrive_offical) |
+| `extensions/pi-image-gen` | Apache-2.0 | [abhishek944/pi-image-gen](https://github.com/abhishek944/pi-image-gen) |
 
-Install one skill globally (Pi reads `~/.agents/skills/`):
-
-```sh
-npx skills add sidkang/pi-stuff --skill jj -g -a pi
-npx skills update -g
-```
-
-Adapted skills record their upstream commit or version and local changes in the `SKILL.md` frontmatter.
-
-## Packages
-
-Extensions with npm dependencies, published to npm.
-
-| Package | Description |
-| --- | --- |
-| [@sidkang/pi-image-gen](packages/pi-image-gen) | `image_generate` tool; Apache-2.0 fork of [abhishek944/pi-image-gen](https://github.com/abhishek944/pi-image-gen) that can reuse Pi providers |
-| [@sidkang/pi-web-access](packages/pi-web-access) | `web_search`, `x_search`, and `fetch_content` tools |
-
-```sh
-pi install npm:@sidkang/pi-web-access
-```
+Everything else is MIT (see [LICENSE](LICENSE)).
 
 ## Develop
 
 ```sh
 npm install
 npm test
-npx skills add . --list
+PI_CODING_AGENT_DIR=~/.config/pi/dev-agent pi -e .   # try local changes in a separate profile
 ```
