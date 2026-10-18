@@ -8,9 +8,9 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 // Real CLI/RPC/agent/tools/persistence; only the external provider is a fixture.
 // Require an explicit modern host, rather than silently using package-local Pi.
 const piPackageDir = process.env.PI_PACKAGE_DIR;
-assert.ok(piPackageDir, "Set PI_PACKAGE_DIR to the installed Pi 1.2.0 package directory.");
+assert.ok(piPackageDir, "Set PI_PACKAGE_DIR to the installed Pi 1.2.0 or 1.3.0 package directory.");
 const piPackage = JSON.parse(readFileSync(join(piPackageDir, "package.json"), "utf8"));
-assert.equal(piPackage.version, "1.2.0", "This E2E targets the Pi 1.2.0 native provider/codemode/RPC contract.");
+assert.ok(["1.2.0", "1.3.0"].includes(piPackage.version), "This E2E targets the Pi 1.2.0 and 1.3.0 native provider/codemode/RPC contract.");
 const cliPath = join(piPackageDir, "dist", "bundle", "cli.js");
 assert.ok(existsSync(cliPath));
 const { RpcClient } = await import(pathToFileURL(join(piPackageDir, "dist", "index.js")).href);

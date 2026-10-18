@@ -8,9 +8,10 @@ import {
 	createExtensionRuntime,
 	ExtensionRunner,
 } from "@earendil-works/pi-coding-agent";
-import { loadExtensionFromFactory } from "./node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/loader.js";
-import { runAgentLoop } from "./node_modules/@earendil-works/pi-coding-agent/node_modules/@earendil-works/pi-agent-core/dist/agent-loop.js";
+import { importHostModules } from "../../tests/pi-host.mjs";
 import applyPatch from "./index.ts";
+
+const { loadExtensionFromFactory, runAgentLoop } = await importHostModules(import.meta.url);
 
 function assistantToolCall(name, args) {
 	const message = {

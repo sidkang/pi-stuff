@@ -22,11 +22,11 @@ export function discoverHost() {
 	for (const root of candidates) {
 		try {
 			const pkg = JSON.parse(readFileSync(join(root, "package.json"), "utf8"));
-			if (pkg.name === "@earendil-works/pi-coding-agent" && ["0.99.1", "0.99.2", "1.1.0"].includes(pkg.version)
+			if (pkg.name === "@earendil-works/pi-coding-agent" && ["0.99.1", "0.99.2", "1.1.0", "1.3.0"].includes(pkg.version)
 				&& existsSync(join(root, "dist/index.js")) && existsSync(join(root, "dist/index.d.ts"))) return { root, version: pkg.version, require: createRequire(join(root, "package.json")) };
 		} catch {}
 	}
-	throw new Error("Pi 0.99.1, 0.99.2, or 1.1.0 host not found. Set PI_WEB_ACCESS_HOST to its @earendil-works/pi-coding-agent package directory.");
+	throw new Error("Pi 0.99.1, 0.99.2, 1.1.0, or 1.3.0 host not found. Set PI_WEB_ACCESS_HOST to its @earendil-works/pi-coding-agent package directory.");
 }
 
 export function hostDependency(host, name) {

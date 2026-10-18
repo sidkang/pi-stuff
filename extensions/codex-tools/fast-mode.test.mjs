@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import fastMode, { applyFastServiceTier } from "./fast-mode.ts";
-import { createMockContext, createMockFunction, createMockPi } from "../../../tests/extension-harness.mjs";
+import { createMockContext, createMockFunction, createMockPi } from "../../tests/extension-harness.mjs";
 
 const fastModeSettings = {
 	eligibleModels: new Set(["gpt-5.5"]),

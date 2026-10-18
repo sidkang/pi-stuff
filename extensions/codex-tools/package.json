@@ -8,8 +8,8 @@
     "node": ">=22.19.0"
   },
   "scripts": {
-    "test": "node --import tsx --test provider-headers.test.mjs settings.test.mjs fast-mode.test.mjs responses-compaction.test-runner.mjs responses-compaction-custom-response.test.mjs review/review.test.mjs workspace-files.test.mjs",
-    "test:watch": "node --import tsx --test --watch provider-headers.test.mjs settings.test.mjs fast-mode.test.mjs responses-compaction.test-runner.mjs responses-compaction-custom-response.test.mjs review/review.test.mjs workspace-files.test.mjs",
+    "test": "node --import tsx --test provider-headers.test.mjs settings.test.mjs fast-mode.test.mjs responses-compaction.test-runner.mjs review/review.test.mjs workspace-files.test.mjs",
+    "test:watch": "node --import tsx --test --watch provider-headers.test.mjs settings.test.mjs fast-mode.test.mjs responses-compaction.test-runner.mjs review/review.test.mjs workspace-files.test.mjs",
     "test:e2e": "node e2e/structured-results-and-compaction.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },

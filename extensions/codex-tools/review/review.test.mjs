@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 import test from "node:test";
-import { createMockPi } from "../../../../tests/extension-harness.mjs";
+import { createMockPi } from "../../../tests/extension-harness.mjs";
 import { collectReviewEvidence, evidenceText, parseAdversarialOutput, parseNativeOutput, registerCodeReview, requestReview } from "./index.ts";
 
 const execFile = promisify(execFileCallback);

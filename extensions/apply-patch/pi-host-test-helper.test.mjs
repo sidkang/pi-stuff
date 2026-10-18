@@ -10,7 +10,7 @@ const probe = 'const { findPiHost } = await import("./pi-host-test-helper.mjs");
 
 test("host discovery uses a real tested SDK with matching package/runtime versions", async () => {
 	const host = await findPiHost();
-	assert.ok(["0.99.1", "0.99.2"].includes(host.version));
+	assert.ok(["0.99.1", "0.99.2", "1.3.0"].includes(host.version));
 	assert.equal(host.sdk.VERSION, host.version);
 });
 

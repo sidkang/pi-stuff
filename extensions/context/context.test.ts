@@ -4,7 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 import { after, describe, it } from "node:test";
-import { createMockContext, createMockFunction, createMockPi } from "../../../tests/extension-harness.mjs";
+import { createMockContext, createMockFunction, createMockPi } from "../../tests/extension-harness.mjs";
 
 type ContextModule = {
 	default(pi: any): void;

@@ -1,31 +1,19 @@
 import assert from "node:assert/strict";
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import test from "node:test";
-import { fileURLToPath, pathToFileURL } from "node:url";
 import {
 	createEventBus,
 	createExtensionRuntime,
 	ExtensionRunner,
 } from "@earendil-works/pi-coding-agent";
-
-// Internal host modules are not exported; find the dev dependency whether npm installed it here or hoisted it to a workspace root.
-function findCodingAgent() {
-	for (let dir = dirname(fileURLToPath(import.meta.url)); ; dir = dirname(dir)) {
-		const candidate = join(dir, "node_modules/@earendil-works/pi-coding-agent");
-		if (existsSync(candidate)) return candidate;
-		if (dirname(dir) === dir) throw new Error("@earendil-works/pi-coding-agent dev dependency not found");
-	}
-}
-const codingAgent = findCodingAgent();
-const { loadExtensionFromFactory } = await import(pathToFileURL(join(codingAgent, "dist/core/extensions/loader.js")).href);
-const { runAgentLoop } = await import(
-	pathToFileURL(join(codingAgent, "node_modules/@earendil-works/pi-agent-core/dist/agent-loop.js")).href
-);
+import { importHostModules } from "../../tests/pi-host.mjs";
 import fetchContent, { setFetchContentDepsForTests } from "./fetch-content.ts";
 import webSearch from "./web-search.ts";
 import xSearch from "./x-search-tool.ts";
+
+const { loadExtensionFromFactory, runAgentLoop } = await importHostModules(import.meta.url);
 
 function assistantToolCall(name, args) {
 	const message = {

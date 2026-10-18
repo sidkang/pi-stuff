@@ -17,7 +17,7 @@ test("host-runtime PATH discovery handles official npm symlinks and Homebrew wra
 		writeFileSync(helper, readFileSync(new URL("./host-runtime.mjs", import.meta.url)));
 		const script = `import { discoverHost } from ${JSON.stringify(pathToFileURL(helper).href)};
 console.log(JSON.stringify({ root: discoverHost().root, version: discoverHost().version }));`;
-		for (const version of ["0.99.1", "0.99.2", "1.1.0"]) {
+		for (const version of ["0.99.1", "0.99.2", "1.1.0", "1.3.0"]) {
 			for (const layout of ["npm", "homebrew"]) {
 				const fixture = join(root, `${layout}-${version}`);
 				const bin = join(fixture, "bin");
@@ -43,7 +43,7 @@ console.log(JSON.stringify({ root: discoverHost().root, version: discoverHost().
 					env: { ...env, PI_WEB_ACCESS_HOST: join(root, "missing-override") }, encoding: "utf8", timeout: 10_000,
 				});
 				assert.equal(rejected.status, 1, rejected.error?.message ?? rejected.stderr);
-				assert.match(rejected.stderr, /Pi 0\.99\.1, 0\.99\.2, or 1\.1\.0 host not found/);
+				assert.match(rejected.stderr, /Pi 0\.99\.1, 0\.99\.2, 1\.1\.0, or 1\.3\.0 host not found/);
 			}
 		}
 	} finally {

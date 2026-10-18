@@ -42,7 +42,7 @@ test("context evidence rejects a physical FIFO replacement without blocking fina
     assert.deepEqual(observations.map(item => item.stage), ["fifo-replaced", "verified"]);
     assert.equal(observations[1].retainedText, observations[0].retainedText);
     assert.equal(observations[1].markerCount, 0);
-    assert.ok(["0.99.1", "0.99.2"].includes(observations[1].version));
+    assert.ok(["0.99.1", "0.99.2", "1.3.0"].includes(observations[1].version));
   } finally {
     clearTimeout(deadline);
     if (child.exitCode === null && child.signalCode === null) {
@@ -61,7 +61,7 @@ test("context host overrides fail closed without default discovery", () => {
   try {
     for (const value of ["", "   ", join(root, "missing"), root]) {
       process.env.PI_CONTEXT_TEST_HOST = value;
-      assert.throws(findHost, /Actual Pi 0\.99\.1 or 0\.99\.2 required/);
+      assert.throws(findHost, /Actual Pi 0\.99\.1, 0\.99\.2, or 1\.3\.0 required/);
     }
     process.env.PI_CONTEXT_TEST_HOST = root;
     mkdirSync(join(root, "dist"));
@@ -72,11 +72,11 @@ test("context host overrides fail closed without default discovery", () => {
       JSON.stringify({ name: "@earendil-works/pi-coding-agent", version: "0.99.3" }),
       JSON.stringify({ name: "@earendil-works/pi-coding-agent", version: "0.84.0" })]) {
       writeFileSync(join(root, "package.json"), metadata);
-      assert.throws(findHost, /Actual Pi 0\.99\.1 or 0\.99\.2 required/);
+      assert.throws(findHost, /Actual Pi 0\.99\.1, 0\.99\.2, or 1\.3\.0 required/);
     }
     writeFileSync(join(root, "package.json"), JSON.stringify({ name: "@earendil-works/pi-coding-agent", version: "0.99.2" }));
     rmSync(join(root, "dist/index.js"));
-    assert.throws(findHost, /Actual Pi 0\.99\.1 or 0\.99\.2 required/);
+    assert.throws(findHost, /Actual Pi 0\.99\.1, 0\.99\.2, or 1\.3\.0 required/);
   } finally {
     if (previous === undefined) delete process.env.PI_CONTEXT_TEST_HOST; else process.env.PI_CONTEXT_TEST_HOST = previous;
     rmSync(root, { recursive: true, force: true });
@@ -105,7 +105,7 @@ test("actual Pi 0.99.1/0.99.2 context/native-codemode session pipeline", { timeo
   });
   const host = findHost();
   const version = JSON.parse(readFileSync(join(host, "package.json"), "utf8")).version;
-  assert.ok(["0.99.1", "0.99.2"].includes(version));
+  assert.ok(["0.99.1", "0.99.2", "1.3.0"].includes(version));
   console.log(`Actual Pi host ${version}: ${host}`);
   // SDK config reads package metadata/assets from this env, which can be inherited from a different Pi.
   process.env.PI_PACKAGE_DIR = host;

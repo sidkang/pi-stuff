@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "node --import tsx --test context.test.ts context.e2e.test.mjs",
+    "test": "npm run test:unit",
     "test:unit": "node --import tsx --test context.test.ts",
     "test:e2e": "node --test context.e2e.test.mjs",
     "typecheck": "node typecheck.mjs"

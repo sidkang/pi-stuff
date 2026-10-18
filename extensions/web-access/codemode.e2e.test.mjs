@@ -14,7 +14,7 @@ test("web-access host overrides fail closed without default discovery", () => {
 	try {
 		for (const value of ["", "   ", join(root, "missing"), root]) {
 			process.env.PI_WEB_ACCESS_HOST = value;
-			assert.throws(discoverHost, /Pi 0\.99\.1, 0\.99\.2, or 1\.1\.0 host not found/);
+			assert.throws(discoverHost, /Pi 0\.99\.1, 0\.99\.2, 1\.1\.0, or 1\.3\.0 host not found/);
 		}
 		process.env.PI_WEB_ACCESS_HOST = root;
 		mkdirSync(join(root, "dist"));
@@ -25,11 +25,11 @@ test("web-access host overrides fail closed without default discovery", () => {
 			JSON.stringify({ name: "@earendil-works/pi-coding-agent", version: "0.99.3" }),
 			JSON.stringify({ name: "@earendil-works/pi-coding-agent", version: "0.84.0" })]) {
 			writeFileSync(join(root, "package.json"), metadata);
-			assert.throws(discoverHost, /Pi 0\.99\.1, 0\.99\.2, or 1\.1\.0 host not found/);
+			assert.throws(discoverHost, /Pi 0\.99\.1, 0\.99\.2, 1\.1\.0, or 1\.3\.0 host not found/);
 		}
 		writeFileSync(join(root, "package.json"), JSON.stringify({ name: "@earendil-works/pi-coding-agent", version: "0.99.2" }));
 		rmSync(join(root, "dist/index.js"));
-		assert.throws(discoverHost, /Pi 0\.99\.1, 0\.99\.2, or 1\.1\.0 host not found/);
+		assert.throws(discoverHost, /Pi 0\.99\.1, 0\.99\.2, 1\.1\.0, or 1\.3\.0 host not found/);
 	} finally {
 		if (previous === undefined) delete process.env.PI_WEB_ACCESS_HOST; else process.env.PI_WEB_ACCESS_HOST = previous;
 		rmSync(root, { recursive: true, force: true });
@@ -57,7 +57,7 @@ test("Pi 0.99.1/0.99.2/1.1.0 SDK: native codemode structured web pipeline, spill
 	try {
 		const host = discoverHost();
 		console.log(`Actual Pi host ${host.version}: ${host.root}`);
-		assert.ok(["0.99.1", "0.99.2", "1.1.0"].includes(host.version));
+		assert.ok(["0.99.1", "0.99.2", "1.1.0", "1.3.0"].includes(host.version));
 		// SDK config reads package metadata/assets from this env, which can be inherited from a different Pi.
 		process.env.PI_PACKAGE_DIR = host.root;
 		const sdk = await import(pathToFileURL(join(host.root, "dist/index.js")));

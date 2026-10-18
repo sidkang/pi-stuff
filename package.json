@@ -18,7 +18,8 @@
     "extensions/zfork"
   ],
   "scripts": {
-    "test": "node --test 'skills/**/*.test.mjs' && npm test -w extensions/pi-image-gen -w extensions/web-access"
+    "test": "node --test 'skills/**/*.test.mjs' && npm test --workspaces --if-present",
+    "test:e2e": "npm run test:e2e --workspaces --if-present"
   },
   "pi": {
     "extensions": [
