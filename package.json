@@ -1,0 +1,14 @@
+{
+  "name": "pi-stuff",
+  "private": true,
+  "description": "Personal Pi packages: extensions and skills",
+  "license": "MIT",
+  "keywords": ["pi-package"],
+  "workspaces": ["packages/*"],
+  "scripts": {
+    "test": "node --test 'packages/*/skills/**/*.test.mjs'"
+  },
+  "pi": {
+    "skills": ["./packages/*/skills"]
+  }
+}
