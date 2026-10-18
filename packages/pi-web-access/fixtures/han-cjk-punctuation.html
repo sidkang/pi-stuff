@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <title>Han CJK Punctuation Fixture</title>
+</head>
+<body>
+  <article>
+    <h1>测试文章标题</h1>
+    <div class="article__bd__detail">
+      <p>最后<h-char unicode="ff0c" class="biaodian cjk bd-end bd-cop bd-hangable bd-jiya"><h-inner>，</h-inner></h-char>还是我经常说的<h-char unicode="ff0c" class="biaodian cjk bd-end bd-cop bd-hangable bd-jiya"><h-inner>，</h-inner></h-char>2026是逻辑重构之年<h-char unicode="3002" class="biaodian cjk bd-end bd-cop bd-hangable bd-jiya"><h-inner>。</h-inner></h-char>短期看报表不尽如人意<h-char unicode="ff0c" class="biaodian cjk bd-end bd-cop bd-hangable bd-jiya"><h-inner>，</h-inner></h-char>长期看是把健康留给明天<h-char unicode="3002" class="biaodian cjk bd-end bd-cop bd-hangable bd-jiya"><h-inner>。</h-inner></h-char>产品<h-char unicode="3001" class="biaodian cjk bd-end bd-cop bd-hangable bd-jiya"><h-inner>、</h-inner></h-char>渠道<h-char unicode="3001" class="biaodian cjk bd-end bd-cop bd-hangable bd-jiya"><h-inner>、</h-inner></h-char>价格<h-char unicode="ff0c" class="biaodian cjk bd-end bd-cop bd-hangable bd-jiya"><h-inner>，</h-inner></h-char>三个市场化的地基上半年都在一点点打牢<h-char unicode="ff1b" class="biaodian cjk bd-end bd-jiya"><h-inner>；</h-inner></h-char>往后看<h-char unicode="ff0c" class="biaodian cjk bd-end bd-cop bd-hangable bd-jiya"><h-inner>，</h-inner></h-char>改革最痛的一段已经过去<h-char unicode="ff0c" class="biaodian cjk bd-end bd-cop bd-hangable bd-jiya"><h-inner>，</h-inner></h-char>以后只会比之前好走<h-char unicode="ff0c" class="biaodian cjk bd-end bd-cop bd-hangable bd-jiya"><h-inner>，</h-inner></h-char>多留点时间<h-char unicode="3002" class="biaodian cjk bd-end bd-cop bd-hangable bd-jiya"><h-inner>。</h-inner></h-char></p>
+      <p>普通链接保持：<a href="https://example.com/stock">贵州茅台</a>仍然可用。</p>
+      <!-- Synthetic spacing/control nodes must be dropped, not unwrapped into spaces. -->
+      <p>汉<h-hws hidden> </h-hws>字<h-cs hidden class="jinze-outer"> </h-cs>标点</p>
+    </div>
+  </article>
+  <!-- Semantic ruby must not be flattened by the normalizer. -->
+  <p><h-ruby><h-ru><h-yin>ma</h-yin><h-diao>1</h-diao></h-ru>台</h-ruby></p>
+</body>
+</html>

@@ -21,9 +21,22 @@ npx skills update -g
 
 Adapted skills record their upstream commit or version and local changes in the `SKILL.md` frontmatter.
 
+## Packages
+
+Extensions with npm dependencies, published to npm.
+
+| Package | Description |
+| --- | --- |
+| [@sidkang/pi-web-access](packages/pi-web-access) | `web_search`, `x_search`, and `fetch_content` tools |
+
+```sh
+pi install npm:@sidkang/pi-web-access
+```
+
 ## Develop
 
 ```sh
+npm install
 npm test
 npx skills add . --list
 ```

@@ -1,0 +1,76 @@
+{
+  "name": "@sidkang/pi-web-access",
+  "version": "0.1.1",
+  "private": true,
+  "type": "module",
+  "description": "Pi extension: web search, X search, and CDP content fetch tools",
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "test": "node --import tsx --test $(ls *.test.mjs | grep -v -F .e2e.)",
+    "test:watch": "node --import tsx --test --watch *.test.mjs",
+    "test:e2e": "node --import tsx --test codemode.e2e.test.mjs",
+    "typecheck": "node typecheck-host.mjs"
+  },
+  "keywords": [
+    "pi-package",
+    "pi-extension"
+  ],
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  },
+  "dependencies": {
+    "@firecrawl/html-extractor": "^0.1.2",
+    "defuddle": "^0.19.2",
+    "linkedom": "^0.18.13",
+    "ws": "^8.21.3"
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-ai": "*",
+    "@earendil-works/pi-coding-agent": "*",
+    "@earendil-works/pi-tui": "*",
+    "typebox": "*"
+  },
+  "peerDependenciesMeta": {
+    "@earendil-works/pi-ai": {
+      "optional": true
+    },
+    "@earendil-works/pi-coding-agent": {
+      "optional": true
+    },
+    "typebox": {
+      "optional": true
+    }
+  },
+  "overrides": {
+    "@earendil-works/pi-telemetry": "0.84.0"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-ai": "0.84.0",
+    "@earendil-works/pi-coding-agent": "0.84.0",
+    "@types/node": "24.12.4",
+    "@types/ws": "^8.18.1",
+    "tsx": "4.21.0",
+    "typebox": "1.3.7",
+    "typescript": "6.0.3",
+    "@earendil-works/pi-tui": "0.84.0"
+  },
+  "license": "MIT",
+  "files": [
+    "*.ts",
+    "README.md",
+    "LICENSE"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sidkang/pi-stuff.git",
+    "directory": "packages/pi-web-access"
+  },
+  "homepage": "https://github.com/sidkang/pi-stuff/tree/main/packages/pi-web-access#readme",
+  "publishConfig": {
+    "access": "public"
+  }
+}
