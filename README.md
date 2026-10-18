@@ -1,29 +1,29 @@
 # pi-stuff
 
-Personal [Pi](https://pi.dev) packages. Each directory under `packages/` is an independent npm package.
+Personal [Pi](https://pi.dev) skills and extensions.
 
-| Package | Type | Description |
+## Skills
+
+| Skill | Description | License |
 | --- | --- | --- |
-| [@sidkang/pi-try-serve](packages/pi-try-serve) | Skill | Share local HTML or a static directory through a temporary Cloudflare tunnel |
+| [jj](skills/jj) | Use Jujutsu (jj) and translate Git requests to jj-native operations | MIT |
+| [librarian](skills/librarian) | Cache remote Git repositories for local source and history inspection | Apache-2.0, adapted from [mitsuhiko/agent-stuff](https://github.com/mitsuhiko/agent-stuff) |
+| [quark](skills/quark) | Operate Quark Drive (夸克网盘) with reversible deletion and resumable uploads | Apache-2.0, adapted from [quark-clouddrive/quarkclouddrive_offical](https://github.com/quark-clouddrive/quarkclouddrive_offical) |
+| [try-serve](skills/try-serve) | Share local HTML or a static directory through a temporary Cloudflare tunnel | MIT |
+| [web-browser](skills/web-browser) | Drive Chrome or Chromium through the Chrome DevTools Protocol | Apache-2.0, adapted from [mitsuhiko/agent-stuff](https://github.com/mitsuhiko/agent-stuff) |
 
-## Install
-
-One package:
-
-```sh
-pi install npm:@sidkang/pi-try-serve
-```
-
-Everything in this repository:
+Install one skill globally (Pi reads `~/.agents/skills/`):
 
 ```sh
-pi install git:github.com/sidkang/pi-stuff
+npx skills add sidkang/pi-stuff --skill jj -g -a pi
+npx skills update -g
 ```
+
+Adapted skills record their upstream commit or version and local changes in the `SKILL.md` frontmatter.
 
 ## Develop
 
 ```sh
-npm install
 npm test
-pi -e ./packages/<name>   # try one package for one session
+npx skills add . --list
 ```

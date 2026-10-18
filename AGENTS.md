@@ -1,9 +1,11 @@
 # Repository rules
 
-- Each `packages/pi-<name>/` is one npm package named `@sidkang/pi-<name>`, published on its own. Folder name and npm name leaf must match.
-- Package layout: `package.json` (with `pi` manifest, `files`, `repository.directory`, `publishConfig.access = "public"`), `README.md`, `LICENSE`, and resources in `extensions/` or `skills/<skill-name>/`.
-- Pi supplies `@earendil-works/pi-ai`, `pi-agent-core`, `pi-coding-agent`, `pi-tui`, and `typebox`. List them only in `peerDependencies` with `"*"`, never in `dependencies`.
-- Keep tests next to the code they test and exclude them from `files`.
-- When adding a package, add it to the README table and make sure the root `pi` manifest covers it.
-- Before publishing: `npm test`, `npm pack --dry-run -w packages/<name>`, and install the packed package in a temporary `PI_CODING_AGENT_DIR`.
-- Do not publish to npm, push, or move bookmarks unless asked.
+- The directory decides how an item is installed; each item uses exactly one way:
+  - `skills/<name>/`: installed with `npx skills add sidkang/pi-stuff --skill <name>`. The frontmatter `name` must equal `<name>`.
+  - `extensions/<name>.ts` or `extensions/<name>/`: extensions without npm dependencies, loaded from a local checkout through the `extensions` path in Pi settings.
+  - `packages/pi-<name>/`: extensions with npm dependencies, published to npm as `@sidkang/pi-<name>`.
+- Root `LICENSE` (MIT) covers original work. An adapted item keeps its upstream license file inside its directory and records upstream and local changes in its frontmatter or README.
+- Pi supplies `@earendil-works/pi-ai`, `pi-agent-core`, `pi-coding-agent`, `pi-tui`, and `typebox`. In packages, list them only in `peerDependencies` with `"*"`.
+- Keep tests next to the code they test. `npm test` runs them.
+- When adding an item, add it to the README.
+- Before pushing, run `npm test` and gitleaks. Do not publish to npm, push, or move bookmarks unless asked.
