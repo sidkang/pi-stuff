@@ -14,6 +14,7 @@
     "extensions/goal",
     "extensions/pi-image-gen",
     "extensions/soul",
+    "extensions/uv",
     "extensions/web-access",
     "extensions/zfork"
   ],

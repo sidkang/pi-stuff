@@ -1,0 +1,69 @@
+#!/bin/bash
+name="$(basename "$0")"
+
+# Block `-m pip|venv|py_compile` (also `-mpip` etc.). Other arguments pass through.
+module=""
+prev=""
+for arg in "$@"; do
+    if [ "$prev" = "-m" ]; then module="$arg"; break; fi
+    case "$arg" in
+        -m?*) module="${arg#-m}"; break ;;
+        -c|-) break ;;
+        -W|-X|--check-hash-based-pycs) ;;
+        -*) ;;
+        *) [ "$prev" = "-W" ] || [ "$prev" = "-X" ] || [ "$prev" = "--check-hash-based-pycs" ] || break ;;
+    esac
+    prev="$arg"
+done
+
+case "$module" in
+    pip)
+        echo "Error: '$name -m pip' is disabled. Use uv instead:" >&2
+        echo "" >&2
+        echo "  To install a package for a script: uv run --with PACKAGE python script.py" >&2
+        echo "  To add a dependency to the project: uv add PACKAGE" >&2
+        echo "" >&2
+        exit 1
+        ;;
+    venv)
+        echo "Error: '$name -m venv' is disabled. Use the centralized mise-managed venv setup instead:" >&2
+        echo "" >&2
+        echo "  To initialize a project venv: mise py:init [VENV_NAME]" >&2
+        echo "  To recreate it: mise py:reset [VENV_NAME]" >&2
+        echo "" >&2
+        exit 1
+        ;;
+    py_compile)
+        echo "Error: '$name -m py_compile' is disabled because it writes .pyc files to __pycache__." >&2
+        echo "" >&2
+        echo "  To verify syntax without bytecode output: uv run python -m ast path/to/file.py >/dev/null" >&2
+        echo "" >&2
+        exit 1
+        ;;
+esac
+
+# Pick an interpreter outside this directory so `uv run` cannot recurse into the shim.
+# Prefer the mise-managed project interpreter (UV_PYTHON), then uv-managed Python.
+shim_dir="$(cd "$(dirname "$0")" && pwd)"
+
+resolve_python() {
+    local candidate
+    for candidate in "${UV_PYTHON:-}" "$(uv python find --managed-python 2>/dev/null || true)"; do
+        [ -x "$candidate" ] && [ "$(cd "$(dirname "$candidate")" && pwd)" != "$shim_dir" ] || continue
+        echo "$candidate"
+        return 0
+    done
+    while IFS= read -r candidate; do
+        [ "$(cd "$(dirname "$candidate")" && pwd)" = "$shim_dir" ] && continue
+        echo "$candidate"
+        return 0
+    done < <(type -aP python3 python 2>/dev/null)
+    return 1
+}
+
+UV_PYTHON="$(resolve_python)" || {
+    echo "Error: Unable to locate a Python interpreter outside the uv shims." >&2
+    exit 1
+}
+export UV_PYTHON
+exec uv run python "$@"

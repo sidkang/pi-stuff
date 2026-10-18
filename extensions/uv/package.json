@@ -1,0 +1,16 @@
+{
+  "name": "uv",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "description": "Bash guardrail that redirects Python tooling to uv, adapted from mitsuhiko/agent-stuff",
+  "scripts": {
+    "test": "node --import tsx --test command-policy.test.ts shims.test.ts"
+  },
+  "pi": {
+    "extensions": [
+      "./index.ts"
+    ]
+  }
+}
