@@ -4,10 +4,20 @@
   "private": true,
   "type": "module",
   "license": "Apache-2.0",
+  "scripts": {
+    "test": "node --test btw.test.mjs"
+  },
   "description": "Branch-aware BTW side chat from mitsuhiko/agent-stuff",
   "pi": {
     "extensions": [
       "./btw.ts"
     ]
+  },
+  "peerDependencies": {
+    "@earendil-works/pi-tui": "*"
+  },
+  "devDependencies": {
+    "@earendil-works/pi-tui": "^1.4.0",
+    "esbuild": "^0.27.7"
   }
 }

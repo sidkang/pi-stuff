@@ -93,7 +93,9 @@ function createBtwResourceLoader(ctx: ExtensionContext, appendSystemPrompt: stri
 		getThemes: () => ({ themes: [], diagnostics: [] }),
 		getAgentsFiles: () => ({ agentsFiles: [] }),
 		getSystemPrompt: () => systemPrompt,
+		getSystemPromptSource: () => undefined,
 		getAppendSystemPrompt: () => appendSystemPrompt,
+		getAppendSystemPromptSources: () => [],
 		extendResources: () => {},
 		reload: async () => {},
 	};
@@ -270,12 +272,12 @@ class BtwOverlay extends Container implements Focusable {
 	}
 
 	override render(width: number): string[] {
-		const dialogWidth = Math.max(56, Math.min(width, Math.floor(width * 0.9)));
-		const innerWidth = Math.max(40, dialogWidth - 2);
-		const terminalRows = process.stdout.rows ?? 30;
-		const dialogHeight = Math.max(16, Math.min(30, Math.floor(terminalRows * 0.75)));
-		const chromeHeight = 7;
-		const transcriptHeight = Math.max(6, dialogHeight - chromeHeight);
+		const dialogWidth = Math.max(2, width);
+		const innerWidth = Math.max(1, dialogWidth - 2);
+		const terminalRows = this.tui.terminal.rows;
+		const dialogHeight = Math.max(10, Math.min(30, Math.floor(terminalRows * 0.78)));
+		const chromeHeight = 9;
+		const transcriptHeight = Math.max(1, dialogHeight - chromeHeight);
 
 		// Markdown renders to innerWidth already — no manual wrapping needed
 		const transcript = this.getTranscript(innerWidth, this.theme);
@@ -284,10 +286,7 @@ class BtwOverlay extends Container implements Focusable {
 
 		const status = this.getStatus();
 
-		const previousFocused = this.input.focused;
-		this.input.focused = false;
 		const inputLine = this.input.render(innerWidth)[0] ?? "";
-		this.input.focused = previousFocused;
 
 		const lines = [
 			this.borderLine(innerWidth, "top"),
@@ -554,19 +553,19 @@ export default function (pi: ExtensionAPI) {
 			return null;
 		}
 
+		const sessionManager = SessionManager.inMemory(ctx.cwd);
+		for (const message of buildSeedMessages(ctx, thread)) {
+			sessionManager.appendMessage(message);
+		}
+
 		const { session } = await createAgentSession({
-			sessionManager: SessionManager.inMemory(),
+			cwd: ctx.cwd,
+			sessionManager,
 			model: ctx.model,
-			modelRegistry: ctx.modelRegistry as AgentSession["modelRegistry"],
 			thinkingLevel: pi.getThinkingLevel() as SessionThinkingLevel,
 			tools: ["read", "bash", "edit", "write"],
 			resourceLoader: createBtwResourceLoader(ctx),
 		});
-
-		const seedMessages = buildSeedMessages(ctx, thread);
-		if (seedMessages.length > 0) {
-			session.agent.state.messages = seedMessages as typeof session.agent.state.messages;
-		}
 
 		const unsubscribe = session.subscribe((event: AgentSessionEvent) => {
 			if (!sideBusy || !pendingQuestion) {
@@ -577,12 +576,14 @@ export default function (pi: ExtensionAPI) {
 				case "message_start":
 				case "message_update":
 				case "message_end": {
+					if (event.message.role !== "assistant") return;
+					if (event.type === "message_start") pendingAnswer = "";
 					const streamed = extractEventAssistantText(event.message);
 					if (streamed) {
 						pendingAnswer = streamed;
 						pendingError = null;
 					}
-					setOverlayStatus(event.type === "message_end" ? "Finalizing side response..." : "Streaming side response...", true);
+					setOverlayStatus(streamed ? "Streaming side response..." : "Thinking side response...", true);
 					return;
 				}
 				case "tool_execution_start": {
@@ -601,9 +602,8 @@ export default function (pi: ExtensionAPI) {
 					return;
 				}
 				case "tool_execution_end": {
-					const endToolName = (event as { toolName?: string }).toolName ?? "unknown";
 					const tc = pendingToolCalls.find(
-						(t) => t.toolName === endToolName && t.status === "running",
+						(t) => t.toolCallId === event.toolCallId,
 					);
 					if (tc) {
 						tc.status = (event as { isError?: boolean }).isError ? "error" : "done";
@@ -612,7 +612,8 @@ export default function (pi: ExtensionAPI) {
 					return;
 				}
 				case "turn_end": {
-					setOverlayStatus("Finalizing side response...", true);
+					setOverlayStatus(event.message.role === "assistant" && event.message.stopReason === "toolUse"
+						? "Thinking side response..." : "Finalizing side response...", true);
 					return;
 				}
 				default:
@@ -660,7 +661,6 @@ export default function (pi: ExtensionAPI) {
 				return;
 			}
 			runtime.closed = true;
-			runtime.handle?.hide();
 			if (overlayRuntime === runtime) {
 				overlayRuntime = null;
 			}
@@ -711,9 +711,9 @@ export default function (pi: ExtensionAPI) {
 					overlayOptions: {
 						width: "80%",
 						minWidth: 72,
-						maxHeight: "78%",
 						anchor: "top-center",
 						margin: { top: 1, left: 2, right: 2 },
+						visible: (width, height) => width >= 8 && height >= 11,
 					},
 					onHandle: (handle) => {
 						runtime.handle = handle;
@@ -744,9 +744,9 @@ export default function (pi: ExtensionAPI) {
 		}
 
 		const { session } = await createAgentSession({
-			sessionManager: SessionManager.inMemory(),
+			cwd: ctx.cwd,
+			sessionManager: SessionManager.inMemory(ctx.cwd),
 			model,
-			modelRegistry: ctx.modelRegistry as AgentSession["modelRegistry"],
 			thinkingLevel: "off",
 			tools: [],
 			resourceLoader: createBtwResourceLoader(ctx, [BTW_SUMMARY_PROMPT]),
@@ -899,12 +899,17 @@ export default function (pi: ExtensionAPI) {
 			return;
 		}
 
-		setOverlayDraft("");
+		if (sideBusy) {
+			notify(ctx, "BTW is still processing the previous message.", "warning");
+			return;
+		}
+
 		if (!("waitForIdle" in ctx)) {
 			setOverlayStatus("BTW submit requires command context. Re-open with /btw.");
 			return;
 		}
 
+		setOverlayDraft("");
 		await runBtwPrompt(ctx, question);
 	}
 
@@ -912,6 +917,12 @@ export default function (pi: ExtensionAPI) {
 		description: "Open a simple BTW side-chat popover. `/btw <text>` asks immediately, `/btw` opens the side thread.",
 		handler: async (args, ctx) => {
 			const question = args.trim();
+
+			if (sideBusy) {
+				await ensureOverlay(ctx);
+				if (question) notify(ctx, "BTW is still processing the previous message.", "warning");
+				return;
+			}
 
 			if (!question) {
 				if (thread.length > 0 && ctx.hasUI) {

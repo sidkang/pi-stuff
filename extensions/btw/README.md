@@ -6,19 +6,17 @@ metadata:
     commit: 0865c849befd2021490679f96a8dee58c84ac857
     status: modified
     notes:
-      - local: package the unchanged upstream btw.ts as a standalone delivery unit with a local package.json, README, and upstream Apache-2.0 LICENSE.
+      - local: package the upstream extension with its Apache-2.0 LICENSE; fix overlay layout, focus, lifecycle, busy-thread handling, streaming/tool status, and Pi 1.4 SDK/context seeding.
 ---
 
 # btw
 
 A branch-aware side-chat popover from
 [mitsuhiko/agent-stuff](https://github.com/mitsuhiko/agent-stuff/blob/0865c849befd2021490679f96a8dee58c84ac857/extensions/btw.ts).
-The TypeScript implementation is copied without changes.
 
 ## Install
 
-Run `mise push btw` from the repository root, then `/reload` in Pi.
-The installer copies this unit to `<PI_CODING_AGENT_DIR>/extensions/btw/`.
+Install this repository's Pi package, then `/reload` in Pi.
 No npm runtime dependencies are required; Pi supplies its host modules.
 Do not enable another extension registering `/btw` at the same time.
 
@@ -47,6 +45,8 @@ context unless a summary is injected.
   transcript-search, or split-pane controls. Only the tail of recent messages is visible.
 - The input is single-line; additional questions are rejected while a response is running.
 - Saved question/answer text is restored, not the child's full tool transcript.
+- Pi 1.4.0's overlay compositor preserves underlying image rows, so main-chat
+  images can show through the popover.
 
 ## License
 
