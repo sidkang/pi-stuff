@@ -68,9 +68,9 @@ async function runFailingTool(definition, params, ctx, runner) {
 		{
 			model: { provider: "test", id: "gpt-5.6", api: "openai-responses" },
 			convertToLlm: () => [],
-			shouldStopAfterTurn: () => true,
 			async afterToolCall({ toolCall, args, result, isError }) {
-				if (!runner.hasHandlers("tool_result")) return undefined;
+				// Pi 1.4.0 stops the loop after a batch whose results all set `terminate`.
+				if (!runner.hasHandlers("tool_result")) return { terminate: true };
 				const hookResult = await runner.emitToolResult({
 					type: "tool_result",
 					toolName: toolCall.name,
@@ -81,12 +81,13 @@ async function runFailingTool(definition, params, ctx, runner) {
 					isError,
 					usage: result.usage,
 				});
-				if (!hookResult) return undefined;
+				if (!hookResult) return { terminate: true };
 				return {
 					content: hookResult.content,
 					details: hookResult.details,
 					isError: hookResult.isError ?? isError,
 					usage: hookResult.usage,
+					terminate: true,
 				};
 			},
 		},

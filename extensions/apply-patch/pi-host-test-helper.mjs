@@ -4,7 +4,7 @@ import { createRequire } from "node:module";
 import { dirname, join, resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 
-const testedVersions = ["1.3.0", "0.99.2", "0.99.1"];
+const testedVersions = ["1.4.0", "1.3.0", "0.99.2", "0.99.1"];
 
 /** Resolve a real, unpacked Pi SDK; an explicit override never falls back. */
 export async function findPiHost() {
@@ -43,7 +43,7 @@ export async function findPiHost() {
 	// installation of the original regression release is also discoverable.
 	hosts.sort((a, b) => testedVersions.indexOf(a.version) - testedVersions.indexOf(b.version));
 	const host = hosts[0];
-	if (!host) throw new Error(`A real Pi 0.99.1, 0.99.2, or 1.3.0 SDK is required${explicit ? ` at PI_APPLY_PATCH_HOST=${process.env.PI_APPLY_PATCH_HOST}` : "; set PI_APPLY_PATCH_HOST to its unpacked package directory"}. No skip or mocked/older-host fallback is allowed.`);
+	if (!host) throw new Error(`A real Pi 0.99.1, 0.99.2, 1.3.0, or 1.4.0 SDK is required${explicit ? ` at PI_APPLY_PATCH_HOST=${process.env.PI_APPLY_PATCH_HOST}` : "; set PI_APPLY_PATCH_HOST to its unpacked package directory"}. No skip or mocked/older-host fallback is allowed.`);
 	const sdk = await import(pathToFileURL(join(host.root, "dist/index.js")).href);
 	if (sdk.VERSION !== host.version) throw new Error(`Pi package/runtime version mismatch: package ${host.version}, loaded SDK ${sdk.VERSION} (${host.root})`);
 	return { ...host, sdk };

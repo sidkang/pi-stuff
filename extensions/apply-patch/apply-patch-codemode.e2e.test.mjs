@@ -275,6 +275,12 @@ test("actual Pi session: direct and native codemode patch workflows", { timeout:
 			let cancellation;
 			let sawUpdate = false;
 			let cancelledToolCallId;
+			// Pi 1.4.0 delivers the nested end event after prompt()/abort() settle.
+			let resolveCancelled;
+			const cancelledEnd = new Promise((resolve) => { resolveCancelled = resolve; });
+			const unsubscribeEnd = session.subscribe((event) => {
+				if (event.type === "tool_execution_end" && event.toolName === "apply_patch" && event.parentToolCallId && event.toolCallId === cancelledToolCallId) resolveCancelled(event);
+			});
 			const unsubscribe = session.subscribe((event) => {
 				if (event.type === "tool_execution_update" && event.toolName === "apply_patch" && event.parentToolCallId) {
 					sawUpdate = true;
@@ -287,10 +293,11 @@ test("actual Pi session: direct and native codemode patch workflows", { timeout:
 				await session.prompt("Run the cancelled fixture.");
 				await cancellation;
 			} finally { unsubscribe(); }
+			const cancelled = await Promise.race([cancelledEnd, new Promise((_, reject) => setTimeout(() => reject(new Error("nested apply_patch end event never arrived after abort")), 10_000).unref())]);
+			unsubscribeEnd();
 			assert.equal(sawUpdate, true);
 			assert.equal(responses.length, 0);
 			assert.equal(readFileSync(join(cwd, "cancelled.txt"), "utf8"), "keep\n");
-			const cancelled = executions.find((event) => event.type === "tool_execution_end" && event.toolCallId === cancelledToolCallId);
 			assert.equal(cancelled.isError, true);
 			assert.equal(cancelled.result.structuredContent, undefined);
 			assert.match(text(cancelled.result), /abort/i);

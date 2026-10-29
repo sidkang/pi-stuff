@@ -84,8 +84,8 @@ not structured results. Text output, visibility gating, rollback, Workspace
 Authority, and thrown failures are unchanged.
 
 The metadata is additive on older hosts; native codemode consumption and actual
-host declarations are tested against Pi 0.99.1 and 0.99.2 without changing this
-unit's existing development SDK baseline. File mutations declare destructive,
+host declarations are tested against Pi 0.99.1, 0.99.2, 1.3.0, and 1.4.0. The
+development SDK baseline is 1.4.0. File mutations declare destructive,
 non-read-only, non-idempotent, workspace-local annotation hints. These hints do
 not replace permission checks or change the default direct exposure.
 
@@ -96,9 +96,9 @@ not replace permission checks or change the default direct exposure.
 `npm run typecheck:host` runs only the host declaration gate. Existing root test
 and typecheck commands invoke these package gates.
 
-Host discovery prefers the current tested 0.99.2 installation. To run the exact
+Host discovery prefers the newest tested installation. To run the exact
 original 0.99.1 regression, set `PI_APPLY_PATCH_HOST` to that authentic unpacked
-SDK directory. Only these two tested releases are accepted. Explicit overrides
+SDK directory. Only the tested releases above are accepted. Explicit overrides
 fail closed, and loaded SDK `VERSION` must match its package metadata. An inherited
 `PI_PACKAGE_DIR` pointing at another release causes a mismatch; unset it rather
 than bypassing the assertion:
