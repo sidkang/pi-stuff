@@ -1,0 +1,14 @@
+# Gitleaks config for this repository.
+#
+# The only allowlisted match is a fake credential literal used to assert that
+# ResponsesClient redacts reflected secrets from HTTP and SSE error text. The
+# allowlist is the exact literal in those test files, so any other secret in
+# the same files still fails the gate.
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Redaction fixtures: fake key asserted to appear only as [redacted]"
+regexTarget = "secret"
+regexes = ['''sk-live-secret-abc123''']

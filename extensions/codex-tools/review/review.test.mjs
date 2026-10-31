@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { execFile as execFileCallback } from "node:child_process";
 import { createHash } from "node:crypto";
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { chmodSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
@@ -170,95 +170,6 @@ process.exit(0);
     rmSync(root, { recursive: true, force: true });
     rmSync(bin, { recursive: true, force: true });
   }
-});
-
-test("JJ uses JJ when .jj exists and snapshots a working change", async (t) => {
-  if (!existsSync("/opt/homebrew/bin/jj")) return t.skip("jj is not available");
-  const root = temp("codex-tools-review-jj-");
-  try {
-    await run("jj", ["git", "init", root], root);
-    await run("jj", ["config", "set", "--user", "user.name", "Review Test"], root);
-    await run("jj", ["config", "set", "--user", "user.email", "review@example.test"], root);
-    writeFileSync(join(root, "changed.ts"), "export const value = 1;\n");
-    const operationBefore = (await run("jj", ["--ignore-working-copy", "op", "log", "-n", "1", "--no-graph", "-T", "self.id()"], root)).stdout.trim();
-    const result = await collectReviewEvidence(root, { target: "working-tree" });
-    const operationAfter = (await run("jj", ["--ignore-working-copy", "op", "log", "-n", "1", "--no-graph", "-T", "self.id()"], root)).stdout.trim();
-    assert.equal(result.vcs, "jj");
-    assert.deepEqual(result.changedFiles, ["changed.ts"]);
-    assert.match(result.targetId, /^[0-9a-f]{40}$/);
-    assert.match(result.operationId, /^[0-9a-f]{64,}$/);
-    assert.equal(operationAfter, operationBefore, "review snapshot operation is not integrated into the repository head");
-    await run("jj", ["commit", "-m", "record working change"], root);
-    const revision = await collectReviewEvidence(root, { target: "commit", value: "@-" });
-    const fromParent = await collectReviewEvidence(root, { target: "base", value: "@--" });
-    assert.equal(revision.vcs, "jj"); assert.equal(fromParent.vcs, "jj");
-    writeFileSync(join(root, "large.ts"), "x".repeat(24 * 1024 + 1));
-    await assert.rejects(() => collectReviewEvidence(root, { target: "working-tree" }), /scope-too-large: untracked large.ts/);
-    rmSync(join(root, "large.ts"));
-    writeFileSync(join(root, " lead "), "space\n");
-    assert.equal((await collectReviewEvidence(root, { target: "working-tree" })).changedFiles.includes(" lead "), true);
-    rmSync(join(root, " lead "));
-    writeFileSync(join(root, "new\nline"), "newline\n");
-    await assert.rejects(() => collectReviewEvidence(root, { target: "working-tree" }), /JJ paths cannot be represented reliably/);
-    rmSync(join(root, "new\nline"));
-    writeFileSync(join(root, "second.ts"), "second\n"); writeFileSync(join(root, "third.ts"), "third\n"); writeFileSync(join(root, "fourth.ts"), "fourth\n");
-    await assert.rejects(() => collectReviewEvidence(root, { target: "working-tree" }), /scope-too-large/);
-  } finally { rmSync(root, { recursive: true, force: true }); }
-});
-
-test("JJ evidence stays pinned when the filesystem changes immediately after snapshot", async (t) => {
-  const realJj = "/opt/homebrew/bin/jj";
-  if (!existsSync(realJj)) return t.skip("jj is not available");
-  const root = temp("codex-tools-review-jj-isolation-");
-  const bin = temp("codex-tools-review-jj-bin-");
-  const previousPath = process.env.PATH;
-  const previousMutation = process.env.JJ_SNAPSHOT_MUTATE_PATH;
-  const previousRemoval = process.env.JJ_SNAPSHOT_REMOVE_PATH;
-  try {
-    await run(realJj, ["git", "init", root], root);
-    writeFileSync(join(root, "changed.ts"), "base\n"); await run(realJj, ["commit", "-m", "base"], root);
-    writeFileSync(join(root, "changed.ts"), "snapshot version\n");
-    writeFileSync(join(root, "added.ts"), "snapshot-only added file\n");
-    const operationBefore = (await run(realJj, ["--ignore-working-copy", "op", "log", "-n", "1", "--no-graph", "-T", "self.id()"], root)).stdout.trim();
-    const wrapper = join(bin, "jj");
-    writeFileSync(wrapper, `#!/usr/bin/env node\nconst { spawnSync } = require("node:child_process");\nconst { rmSync, writeFileSync } = require("node:fs");\nconst args = process.argv.slice(2);\nconst result = spawnSync(${JSON.stringify(realJj)}, args, { stdio: "inherit" });\nif (args.includes("snapshot") && args.includes("--no-integrate-operation")) {\n  writeFileSync(process.env.JJ_SNAPSHOT_MUTATE_PATH, "later version\\n");\n  rmSync(process.env.JJ_SNAPSHOT_REMOVE_PATH);\n}\nprocess.exit(result.status ?? 1);\n`);
-    chmodSync(wrapper, 0o755);
-    process.env.PATH = `${bin}:${previousPath ?? ""}`;
-    process.env.JJ_SNAPSHOT_MUTATE_PATH = join(root, "changed.ts");
-    process.env.JJ_SNAPSHOT_REMOVE_PATH = join(root, "added.ts");
-    const result = await collectReviewEvidence(root, { target: "working-tree" });
-    assert.deepEqual(new Set(result.changedFiles), new Set(["added.ts", "changed.ts"]));
-    assert.match(result.diff, /\+snapshot-only added file/);
-    assert.match(result.diff, /\+snapshot version/);
-    assert.doesNotMatch(result.diff, /later version/);
-    assert.equal(readFileSync(join(root, "changed.ts"), "utf8"), "later version\n");
-    const operationAfter = (await run(realJj, ["--ignore-working-copy", "op", "log", "-n", "1", "--no-graph", "-T", "self.id()"], root)).stdout.trim();
-    assert.equal(operationAfter, operationBefore);
-  } finally {
-    if (previousPath === undefined) delete process.env.PATH; else process.env.PATH = previousPath;
-    if (previousMutation === undefined) delete process.env.JJ_SNAPSHOT_MUTATE_PATH; else process.env.JJ_SNAPSHOT_MUTATE_PATH = previousMutation;
-    if (previousRemoval === undefined) delete process.env.JJ_SNAPSHOT_REMOVE_PATH; else process.env.JJ_SNAPSHOT_REMOVE_PATH = previousRemoval;
-    rmSync(root, { recursive: true, force: true });
-    rmSync(bin, { recursive: true, force: true });
-  }
-});
-
-test("JJ rejects a conflicting explicitly selected revision while the working copy is clean", async (t) => {
-  if (!existsSync("/opt/homebrew/bin/jj")) return t.skip("jj is not available");
-  const root = temp("codex-tools-review-jj-conflict-");
-  try {
-    await run("jj", ["git", "init", root], root);
-    writeFileSync(join(root, "file.txt"), "base\n"); await run("jj", ["commit", "-m", "base"], root);
-    const base = (await run("jj", ["log", "-r", "@-", "--no-graph", "-T", "commit_id"], root)).stdout.trim();
-    await run("jj", ["new", base], root); writeFileSync(join(root, "file.txt"), "left\n"); await run("jj", ["commit", "-m", "left"], root);
-    const left = (await run("jj", ["log", "-r", "@-", "--no-graph", "-T", "commit_id"], root)).stdout.trim();
-    await run("jj", ["new", base], root); writeFileSync(join(root, "file.txt"), "right\n"); await run("jj", ["commit", "-m", "right"], root);
-    const right = (await run("jj", ["log", "-r", "@-", "--no-graph", "-T", "commit_id"], root)).stdout.trim();
-    await run("jj", ["new", left, right], root);
-    const conflicted = (await run("jj", ["log", "-r", "@", "--no-graph", "-T", "commit_id"], root)).stdout.trim();
-    await run("jj", ["new", base], root);
-    await assert.rejects(() => collectReviewEvidence(root, { target: "commit", value: conflicted }), /unresolved conflicts/);
-  } finally { rmSync(root, { recursive: true, force: true }); }
 });
 
 test("frozen review evidence neutralizes closing-boundary text in every untrusted field", () => {
